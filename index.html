@@ -15,7 +15,7 @@
 			<div class="card">
 				<div class="card-body">
 					<div class="row">
-						<div class="col-md-5">
+						<div class="col-md-4">
 							<div class="input-group input-group-sm mb-3">
 									<div class="input-group-prepend">
 										<span class="input-group-text" id="copper">Copper</span>
@@ -47,7 +47,7 @@
 								<input type="text" id="platinumInput" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
 							</div>
 						</div>
-						<div class="col-md-7">
+						<div class="col-md-8">
 							<div class="input-group input-group-sm mb-3">
 									<div class="input-group-prepend">
 										<span class="input-group-text bg-dark text-white" id="players">Number of Players</span>
@@ -57,17 +57,23 @@
 							<table class="table table-sm" id="output">
 								<tr>
 									<th>Player</th>
-									<th>Plat</th>
-									<th>Gold</th>
-									<th>Elect</th>
-									<th>Silver</th>
 									<th>Copper</th>
+									<th>Silver</th>
+									<th>Elect</th>
+									<th>Gold</th>
+									<th>Plat</th>
+									<th>Total</th>
+									
 								</tr>
 
 							</table>
 						</div>
+						
+					</div>
+					<div class="row">
 						<div class="col">
-							<button onclick="divideMoney()" class="btn btn-success">Divide the Money!</button>
+								<button onclick="divideMoney()" class="btn btn-success">Divide the Money!</button>
+								<button onclick="reset()" class="btn btn-danger">Reset</button>
 						</div>
 					</div>
 				</div>
@@ -75,6 +81,26 @@
 		</div>
 
 		<script>
+			function reset()
+			{
+				var oldRows = [];
+				oldRows = document.getElementsByClassName("toBeDeleted");
+
+				var size = oldRows.length - 1;
+
+				for (i = size; i>=0; i--)
+				{
+					oldRows[i].parentNode.removeChild(oldRows[i]);
+				}
+
+				inputs = document.getElementsByClassName("form-control");
+
+				for (i = inputs; i>=0; i--)
+				{
+					inputs[i].value = "";
+				}
+			}
+
 			function divideMoney() {
 				var oldRows = [];
 				oldRows = document.getElementsByClassName("toBeDeleted");
@@ -91,6 +117,8 @@
 				var electrum;
 				var gold;
 				var platinum;
+
+				var players
 
 				if (document.getElementById("copperInput").value != "")
 				{
@@ -133,7 +161,16 @@
 					platinum = 0;
 				}
 
-				var players = parseInt(document.getElementById("playersInput").value);
+	
+				if (document.getElementById("playersInput").value != "")
+				{
+					players = parseInt(document.getElementById("playersInput").value);
+				}				
+				else
+				{
+					return;
+				}
+
 				var playersArray = [];
 
 
@@ -145,37 +182,99 @@
 						electrum: 0,
 						gold: 0,
 						platinum: 0,
+						total: 0
 					})
 				}
 				
-				while (copper > 0 || silver > 0 || electrum > 0 || gold > 0 || platinum > 0)
+				total = copper + silver*10 + electrum*50 + gold*100 + platinum*1000;
+
+				targetDivision = total/players;
+
+
+				for (i=0; i<players;i++)
+				{
+					
+				}
+
+				while (platinum>0)
 				{
 					for (i=0; i<players; i++)
 					{
-						if (copper > 0)
+						if (playersArray[i].total >= targetDivision)
 						{
-							copper--;
-							playersArray[i].copper += 1;
-						}
-						if (silver > 0)
-						{
-							silver--;
-							playersArray[i].silver++;
-						}
-						if (electrum > 0)
-						{
-							electrum--;
-							playersArray[i].electrum = playersArray[i].electrum + 1;
-						}
-						if (gold > 0)
-						{
-							gold--;
-							playersArray[i].gold++;
+							continue;
 						}
 						if (platinum > 0)
 						{
 							platinum--;
 							playersArray[i].platinum++;
+							playersArray[i].total+= 1000;
+						}
+					}
+				}
+
+				while (gold>0)
+				{
+					for (i=0; i<players; i++)
+					{
+						if (playersArray[i].total >= targetDivision)
+						{
+							continue;
+						}
+						if (gold > 0)
+						{
+							gold--;
+							playersArray[i].gold++;
+							playersArray[i].total+= 100;
+						}
+					}
+				}
+				while (electrum>0)
+				{
+					for (i=0; i<players; i++)
+					{
+						if (playersArray[i].total >= targetDivision)
+						{
+							continue;
+						}
+						if (electrum > 0)
+						{
+							electrum--;
+							playersArray[i].electrum++;
+							playersArray[i].total+= 50;
+						}
+					}
+				}
+				while (silver>0)
+				{
+					for (i=0; i<players; i++)
+					{
+						if (playersArray[i].total >= targetDivision)
+						{
+							continue;
+						}
+						if (silver > 0)
+						{
+							silver--;
+							playersArray[i].silver++;
+							playersArray[i].total+= 10;
+						}
+					}
+				}
+				
+				while (copper>0)
+				{
+					for (i=0; i<players; i++)
+					{
+						if (playersArray[i].total >= targetDivision)
+						{
+							continue;
+						}
+						if (copper > 0)
+						{
+							copper--;
+							playersArray[i].copper++;
+							playersArray[i].total+= 1;
 						}
 					}
 				}
@@ -190,15 +289,7 @@
 					row.appendChild(cell);
 
 					var cell = document.createElement('td');
-					cell.appendChild(document.createTextNode(playersArray[i-1].platinum));
-					row.appendChild(cell);
-
-					var cell = document.createElement('td');
-					cell.appendChild(document.createTextNode(playersArray[i-1].gold));
-					row.appendChild(cell);
-
-					var cell = document.createElement('td');
-					cell.appendChild(document.createTextNode(playersArray[i-1].electrum));
+					cell.appendChild(document.createTextNode(playersArray[i-1].copper));
 					row.appendChild(cell);
 
 					var cell = document.createElement('td');
@@ -206,9 +297,20 @@
 					row.appendChild(cell);
 
 					var cell = document.createElement('td');
-					cell.appendChild(document.createTextNode(playersArray[i-1].copper));
+					cell.appendChild(document.createTextNode(playersArray[i-1].electrum));
 					row.appendChild(cell);
 
+					var cell = document.createElement('td');
+					cell.appendChild(document.createTextNode(playersArray[i-1].gold));
+					row.appendChild(cell);
+
+					var cell = document.createElement('td');
+					cell.appendChild(document.createTextNode(playersArray[i-1].platinum));
+					row.appendChild(cell);
+
+					var cell = document.createElement('td');
+					cell.appendChild(document.createTextNode(playersArray[i-1].total));
+					row.appendChild(cell);
 					
 					
 					document.getElementById("output").appendChild(row);
